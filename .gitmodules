@@ -1,0 +1,3 @@
+[submodule "linked-list"]
+	path = linked-list
+	url = git@github.com:guy-732/c-linked-list.git
