@@ -5,7 +5,16 @@
 #include "hash-table.h"
 #include "_ht-node.h"
 
+
+typedef struct ht_to_ll_ctx_t
+{
+	ht_consume_func_t f;
+	void * ctx;
+} ht_to_ll_ctx_t;
+
+
 static int cmp_ll_vals(ll_value_t v1, ll_value_t v2);
+static void ht_clear_consumer(ll_value_t v, void * ctx);
 
 
 bool ht_init(hash_table_t * ht, hash_func_t f, float load_factor, uint64_t initial_capacity)
@@ -38,6 +47,39 @@ bool ht_init(hash_table_t * ht, hash_func_t f, float load_factor, uint64_t initi
 	return true;
 }
 
+void ht_clear(hash_table_t * ht, ht_consume_func_t f, void * ctx)
+{
+	ht_to_ll_ctx_t c = {.f = f, .ctx = ctx};
+	uint64_t i;
+
+	if (ht == NULL || ht->table == NULL)
+	{
+		errno = EINVAL;
+		return;
+	}
+
+	for (i = 0; i < ht->allocated; ++i)
+	{
+		ll_clear(ht->table + i, ht_func_consumer, (void *) &c);
+	}
+
+	ht->size = 0;
+}
+
+
+void ht_finalize(hash_table_t * ht)
+{
+	if (ht == NULL)
+	{
+		errno = EINVAL;
+		return;
+	}
+
+	ht_clear(ht, NULL, NULL);
+	free(ht->table);
+	ht->table = NULL;
+	ht->allocated = 0;
+}
 
 
 static int cmp_ll_vals(ll_value_t v1, ll_value_t v2)
@@ -47,4 +89,14 @@ static int cmp_ll_vals(ll_value_t v1, ll_value_t v2)
 	ht_node_t * n2 = (v2 != NULL) ? v2 : &dummy;
 
 	return (n1->hash == n2->hash) ? 0 : ((n1->hash < n2->hash) ? -1 : 1);
+}
+
+static void ht_func_consumer(ll_value_t v, void * ctx)
+{
+	ht_node_t * n = (ht_node_t *) v;
+	ht_to_ll_ctx_t * c = (ht_to_ll_ctx_t *) ctx;
+	if (n == NULL || c == NULL || c->f == NULL)
+		return;
+
+	c->f(n->key, n->value, c->ctx);
 }

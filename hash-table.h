@@ -37,4 +37,17 @@ typedef struct hash_table_t
  */
 bool ht_init(hash_table_t * ht, hash_func_t f, float load_factor, uint64_t initial_capacity);
 
+/*
+ * clear all elements from the hash table
+ */
+void ht_clear(hash_table_t * ht, ht_consume_func_t f, void * ctx);
+
+/*
+ * Finalize the hash table, `ht_init` may be called on a hash table after it has been finalized
+ *
+ * This function MUST be called on any initialized hash table after being used
+ * failure to do so will result in memory leak(s)
+ */
+void ht_finalize(hash_table_t * ht);
+
 #endif
