@@ -41,6 +41,7 @@ bool ht_init(hash_table_t * ht, hash_func_t f, float load_factor, uint64_t initi
 	ht->load_factor = load_factor;
 	ht->hash_func = f;
 	/* ht->size already equal 0 */
+	ht->threshold = initial_capacity * load_factor;
 	ht->allocated = initial_capacity;
 	ht->table = array;
 
@@ -79,6 +80,7 @@ void ht_finalize(hash_table_t * ht)
 	free(ht->table);
 	ht->table = NULL;
 	ht->allocated = 0;
+	ht->threshold = 0;
 }
 
 

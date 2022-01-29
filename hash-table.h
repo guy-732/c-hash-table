@@ -21,6 +21,7 @@ typedef struct hash_table_t
 	hash_func_t hash_func;
 
 	uint64_t size;
+	uint64_t threshold;
 	uint64_t allocated;
 	linked_list_t * table;
 } hash_table_t;
