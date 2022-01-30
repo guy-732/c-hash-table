@@ -14,7 +14,7 @@ typedef struct ht_to_ll_ctx_t
 
 
 static int cmp_ll_vals(ll_value_t v1, ll_value_t v2);
-static void ht_clear_consumer(ll_value_t v, void * ctx);
+static void ht_func_consumer(ll_value_t v, void * ctx);
 
 
 bool ht_init(hash_table_t * ht, hash_func_t f, float load_factor, uint64_t initial_capacity)
@@ -81,6 +81,21 @@ void ht_finalize(hash_table_t * ht)
 	ht->table = NULL;
 	ht->allocated = 0;
 	ht->threshold = 0;
+}
+
+
+void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx)
+{
+	ht_to_ll_ctx_t c = {.f = f, .ctx = ctx};
+	uint64_t i;
+	if (ht == NULL || f == NULL)
+	{
+		errno = EINVAL;
+		return;
+	}
+
+	for (i = 0; i < ht->allocated; ++i)
+		ll_foreach(ht->table + i, ht_func_consumer, &c);
 }
 
 

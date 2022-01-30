@@ -51,4 +51,6 @@ void ht_clear(hash_table_t * ht, ht_consume_func_t f, void * ctx);
  */
 void ht_finalize(hash_table_t * ht);
 
+void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx);
+
 #endif
