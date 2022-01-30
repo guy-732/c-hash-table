@@ -98,7 +98,8 @@ void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx)
 		ll_foreach(ht->table + i, ht_func_consumer, &c);
 }
 
-
+/* dunno if I'll actually need that tbh, but it doesn't hurt to have it,
+Besides, I can remove it anytime */
 static int cmp_ll_vals(ll_value_t v1, ll_value_t v2)
 {
 	ht_node_t dummy = {.hash = 0};
