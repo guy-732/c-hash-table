@@ -1,7 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
 
-COBJS = hash-table.o _ht-node.o _ht-table.o
+ARCHIVE_COBJS = hash-table.o _ht-node.o _ht-table.o
+COBJS = $(ARCHIVE_COBJS)
 ARCHIVES = libhash-table.a
 LL_ARCHIVE_RAW = liblinked-list.a
 LL_ARCHIVE = linked-list/$(LL_ARCHIVE_RAW)
@@ -21,9 +22,9 @@ all-objs: $(COBJS)
 all-archives: $(ARCHIVES)
 all-shared: $(SHARED_OBJS)
 
-libhash-table.a: hash-table.o _ht-node.o $(LL_ARCHIVE)
+libhash-table.a: $(ARCHIVE_COBJS) $(LL_ARCHIVE)
 	cp $(LL_ARCHIVE) $@
-	$(AR) r $@ hash-table.o _ht-node.o
+	$(AR) r $@ $(ARCHIVE_COBJS)
 
 $(SHARED_OBJS): %.so: %.a
 	$(CC) -shared $(LDFLAGS) -o $@ -Wl,-whole-archive $^ -Wl,-no-whole-archive

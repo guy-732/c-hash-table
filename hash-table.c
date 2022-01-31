@@ -4,6 +4,7 @@
 
 #include "hash-table.h"
 #include "_ht-node.h"
+#include "_ht-table.h"
 
 
 typedef struct ht_to_ll_ctx_t
@@ -80,6 +81,55 @@ void ht_finalize(hash_table_t * ht)
 	ht->table = NULL;
 	ht->allocated = 0;
 	ht->threshold = 0;
+}
+
+
+bool ht_add_value(hash_table_t * ht, ht_key_t key, ht_value_t value, bool * had_key, ht_value_t * old_value)
+{
+	uint64_t hash_res;
+
+	if (ht == NULL || ht->hash_func == NULL)
+	{
+		errno = EINVAL;
+		return false;
+	}
+
+	hash_res = ht->hash_func(key);
+	if (ht->size != 0)
+	{
+		ht_node_t n = {.hash = hash_res}, * searched;
+		if (ll_search(ht->table + hash_res, &n, NULL, (ll_value_t *) &searched))
+		{
+			if (old_value != NULL)
+				*old_value = searched->value;
+
+			searched->value = value;
+			if (had_key != NULL)
+				*had_key = true;
+
+			return true;
+		}
+	}
+
+	ht_node_t * n;
+	if (!_ht_table_resize(ht, ht->size + 1))
+		return false;
+
+	n = _ht_new_node(hash_res, key, value);
+	if (n == NULL)
+		return false;
+
+	if (!ll_insert_head(ht->table + hash_res, n))
+	{
+		_ht_free_node(n);
+		return false;
+	}
+
+	ht->size++;
+	if (had_key != NULL)
+		*had_key = false;
+
+	return true;
 }
 
 

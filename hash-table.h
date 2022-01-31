@@ -53,6 +53,8 @@ void ht_clear(hash_table_t * ht, ht_consume_func_t f, void * ctx);
  */
 void ht_finalize(hash_table_t * ht);
 
+bool ht_add_value(hash_table_t * ht, ht_key_t key, ht_value_t value, bool * had_key, ht_value_t * old_value);
+
 void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx);
 
 #endif
