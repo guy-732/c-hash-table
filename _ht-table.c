@@ -60,7 +60,7 @@ bool _ht_table_resize(hash_table_t * ht, uint64_t new_size)
 		return false;
 
 	for (i = 0; i < new_capacity; ++i)
-		ll_init(table + i, NULL);
+		ll_init(table + i, _ht_compare_node);
 
 	ctx.capacity = new_capacity;
 	ctx.table = table;

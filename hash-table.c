@@ -35,7 +35,7 @@ bool ht_init(hash_table_t * ht, hash_func_t f, float load_factor, uint64_t initi
 		return false;
 
 	for (i = 0; i < initial_capacity; ++i)
-		ll_init(array + i, NULL);
+		ll_init(array + i, _ht_compare_node);
 
 	ht->load_factor = load_factor;
 	ht->hash_func = f;
