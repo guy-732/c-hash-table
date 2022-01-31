@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
 
-COBJS = hash-table.o _ht-node.o
+COBJS = hash-table.o _ht-node.o _ht-table.o
 ARCHIVES = libhash-table.a
 LL_ARCHIVE_RAW = liblinked-list.a
 LL_ARCHIVE = linked-list/$(LL_ARCHIVE_RAW)
@@ -13,6 +13,7 @@ $(COBJS): %.o: %.c
 
 hash-table.o: hash-table.h _ht-node.h
 _ht-node.o: hash-table.h _ht-node.h
+_ht-table.o: hash-table.h _ht-node.h _ht-table.h
 
 
 all: all-objs all-archives all-shared
@@ -37,6 +38,7 @@ clean-shared:
 	$(RM) $(SHARED_OBJS)
 
 clean: clean-objs clean-archives clean-shared
+	$(MAKE) -C linked-list/ RM="$(RM)" clean
 
 debug: CPPFLAGS += -DDEBUG
 debug: CFLAGS += -g

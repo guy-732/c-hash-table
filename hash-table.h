@@ -12,8 +12,10 @@ typedef void * ht_value_t;
 typedef uint64_t (*hash_func_t)(ht_key_t);
 typedef void (*ht_consume_func_t)(ht_key_t, ht_value_t, void * ctx);
 
-#define DEFAULT_LOAD_FACTOR (0.75f)
-#define DEFAULT_INITIAL_CAPACITY ((uint64_t) 1 << 4)
+#define HT_DEFAULT_LOAD_FACTOR (0.75f)
+#define HT_DEFAULT_INITIAL_CAPACITY ((uint64_t) 1 << 4)
+
+#define HT_MAX_ALLOCATED ((uint64_t) 1 << 30)
 
 typedef struct hash_table_t
 {
@@ -28,10 +30,10 @@ typedef struct hash_table_t
 
 /*
  * Initialize a hash table
- * the macros `DEFAULT_LOAD_FACTOR` & `DEFAULT_INITIAL_CAPACITY` can be used for
+ * the macros `HT_DEFAULT_LOAD_FACTOR` & `HT_DEFAULT_INITIAL_CAPACITY` can be used for
  * the corresponding arguments, also,
- * if load_factor == 0.0f -> load_factor = DEFAULT_LOAD_FACTOR
- * if initial_capacity == 0 -> initial_capacity = DEFAULT_INITIAL_CAPACITY
+ * if load_factor == 0.0f -> load_factor = HT_DEFAULT_LOAD_FACTOR
+ * if initial_capacity == 0 -> initial_capacity = HT_DEFAULT_INITIAL_CAPACITY
  *
  * ht == NULL || f == NULL -> errno = EINVAL
  * load_factor < 0.05f || 0.95f < load_factor -> errno = EINVAL
