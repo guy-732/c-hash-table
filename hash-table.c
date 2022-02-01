@@ -157,7 +157,7 @@ static void ht_func_consumer(ll_value_t v, void * ctx)
 	ht_key_t key;
 	ht_value_t value;
 
-	if (n == NULL || c == NULL || c->f == NULL)
+	if (n == NULL || c == NULL)
 		return;
 
 	key = n->key;
@@ -165,5 +165,6 @@ static void ht_func_consumer(ll_value_t v, void * ctx)
 	if (c->clearing)
 		_ht_free_node(n);
 
-	c->f(key, value, c->ctx);
+	if (c->f != NULL)
+		c->f(key, value, c->ctx);
 }
