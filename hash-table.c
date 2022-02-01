@@ -11,6 +11,7 @@ typedef struct ht_to_ll_ctx_t
 {
 	ht_consume_func_t f;
 	void * ctx;
+	bool clearing;
 } ht_to_ll_ctx_t;
 
 
@@ -50,7 +51,7 @@ bool ht_init(hash_table_t * ht, hash_func_t f, float load_factor, uint64_t initi
 
 void ht_clear(hash_table_t * ht, ht_consume_func_t f, void * ctx)
 {
-	ht_to_ll_ctx_t c = {.f = f, .ctx = ctx};
+	ht_to_ll_ctx_t c = {.f = f, .ctx = ctx, .clearing = true};
 	uint64_t i;
 
 	if (ht == NULL || ht->table == NULL)
@@ -136,7 +137,7 @@ bool ht_add_value(hash_table_t * ht, ht_key_t key, ht_value_t value, bool * had_
 
 void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx)
 {
-	ht_to_ll_ctx_t c = {.f = f, .ctx = ctx};
+	ht_to_ll_ctx_t c = {.f = f, .ctx = ctx, .clearing = false};
 	uint64_t i;
 	if (ht == NULL || f == NULL)
 	{
@@ -153,8 +154,16 @@ static void ht_func_consumer(ll_value_t v, void * ctx)
 {
 	ht_node_t * n = (ht_node_t *) v;
 	ht_to_ll_ctx_t * c = (ht_to_ll_ctx_t *) ctx;
+	ht_key_t key;
+	ht_value_t value;
+
 	if (n == NULL || c == NULL || c->f == NULL)
 		return;
 
-	c->f(n->key, n->value, c->ctx);
+	key = n->key;
+	value = n->value;
+	if (c->clearing)
+		_ht_free_node(n);
+
+	c->f(key, value, c->ctx);
 }
