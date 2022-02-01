@@ -98,7 +98,7 @@ bool ht_add_value(hash_table_t * ht, ht_key_t key, ht_value_t value, bool * had_
 	if (ht->size != 0)
 	{
 		ht_node_t n = {.hash = hash_res}, * searched;
-		if (ll_search(ht->table + hash_res, &n, NULL, (ll_value_t *) &searched))
+		if (ll_search(ht->table + (hash_res % ht->allocated), &n, NULL, (ll_value_t *) &searched))
 		{
 			if (old_value != NULL)
 				*old_value = searched->value;
@@ -119,6 +119,7 @@ bool ht_add_value(hash_table_t * ht, ht_key_t key, ht_value_t value, bool * had_
 	if (n == NULL)
 		return false;
 
+	hash_res %= ht->allocated;
 	if (!ll_insert_head(ht->table + hash_res, n))
 	{
 		_ht_free_node(n);
