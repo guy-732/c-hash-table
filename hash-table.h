@@ -55,6 +55,13 @@ void ht_finalize(hash_table_t * ht);
 
 bool ht_add_value(hash_table_t * ht, ht_key_t key, ht_value_t value, bool * had_key, ht_value_t * old_value);
 
+bool ht_search_key(const hash_table_t * ht, ht_key_t key, ht_value_t * value, ht_key_t * stored_key);
+#define ht_get_value(ht, key, value) (ht_search_key((ht), (key), (value), NULL))
+#define ht_contains(ht, key) (ht_get_value((ht), (key), NULL))
+
+#define ht_len(ht) (((const hash_table_t *) (ht))->size)
+#define ht_is_empty(ht) (ht_len((ht)) == 0)
+
 void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx);
 
 #endif
