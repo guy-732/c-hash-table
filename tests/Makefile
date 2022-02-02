@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
 
-EXECS = add-op
+EXECS = add-op search-op
 COBJS = $(EXECS:=.o)
 
 ARCHIVES = ../libhash-table.a
@@ -17,6 +17,7 @@ $(ARCHIVES) &: main-makefile
 $(COBJS): %.o: %.c
 
 add-op: add-op.o ../libhash-table.a
+search-op: search-op.o ../libhash-table.a
 
 
 clean: clean-objs clean-progs
