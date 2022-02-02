@@ -135,6 +135,36 @@ bool ht_add_value(hash_table_t * ht, ht_key_t key, ht_value_t value, bool * had_
 }
 
 
+bool ht_search_key(const hash_table_t * ht, ht_key_t key, ht_value_t * value, ht_key_t * stored_key)
+{
+	ht_node_t n, * res;
+	if (ht == NULL || ht->hash_func == NULL)
+	{
+		errno = EINVAL;
+		return false;
+	}
+
+	if (ht_is_empty(ht))
+		return false;
+
+	n.hash = ht->hash_func(key);
+	if (!ll_search(
+			ht->table + (n.hash % ht->allocated),
+			(ll_value_t) &n, NULL,
+			(ll_value_t *) &res)
+		)
+		return false;
+
+	if (value != NULL)
+		*value = res->value;
+
+	if (stored_key != NULL)
+		*stored_key = res->key;
+
+	return true;
+}
+
+
 void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx)
 {
 	ht_to_ll_ctx_t c = {.f = f, .ctx = ctx, .clearing = false};
