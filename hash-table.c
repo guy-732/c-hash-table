@@ -196,6 +196,11 @@ bool ht_remove_value(hash_table_t * ht, ht_key_t key, ht_value_t * value)
 		*value = res->value;
 
 	final_ret = ll_remove_item(ll, i, NULL);
+	if (final_ret)
+	{
+		ht->size--;
+		_ht_free_node(res);
+	}
 	#ifdef DEBUG
 	if (!final_ret)
 		fprintf(stderr, "WARNING: File %s: Line %d: ll_remove_item() returned false (errno: %s)\n",
@@ -237,7 +242,7 @@ bool ht_resize(hash_table_t * ht, uint64_t min_size)
 	if (min_size == ht->allocated)
 		return true;
 
-	min_capacity = (ht->allocated / ht->load_factor) + 1;
+	min_capacity = (ht_len(ht) / ht->load_factor) + 1;
 	new_capacity = (min_capacity > min_size) ? min_capacity : min_size;
 	if (new_capacity > HT_MAX_ALLOCATED)
 		new_capacity = HT_MAX_ALLOCATED;
