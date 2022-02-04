@@ -20,7 +20,6 @@ bool _ht_table_resize(hash_table_t * ht, uint64_t new_size)
 {
 	linked_list_t * table, * tmp;
 	uint64_t i, min_capacity, new_capacity, new_threshold, old_capacity;
-	_ht_resize_ctx ctx;
 
 	if (ht == NULL)
 		return false;
@@ -62,21 +61,14 @@ bool _ht_table_resize(hash_table_t * ht, uint64_t new_size)
 	for (i = 0; i < new_capacity; ++i)
 		ll_init(table + i, _ht_compare_node);
 
-	ctx.capacity = new_capacity;
-	ctx.table = table;
-	if (setjmp(ctx.jmp) != 0)
+	if (!_ht_transfer(table, new_capacity, ht->table, old_capacity))
 	{
 		for (i = 0; i < new_capacity; ++i)
 			ll_clear(table + i, NULL, NULL);
 
 		free(table);
-
 		return false;
 	}
-
-	if (ht->table != NULL)
-		for (i = 0; i < ht->allocated; ++i)
-			ll_foreach(ht->table + i, _ht_table_resize_consumer, &ctx);
 
 	tmp = ht->table;
 	ht->table = table;
@@ -90,6 +82,22 @@ bool _ht_table_resize(hash_table_t * ht, uint64_t new_size)
 
 		free(tmp);
 	}
+
+	return true;
+}
+
+bool _ht_transfer(linked_list_t * dest, uint64_t dest_capacity, const linked_list_t * src, uint64_t src_capacity)
+{
+	uint64_t i;
+	_ht_resize_ctx ctx;
+	ctx.capacity = dest_capacity;
+	ctx.table = dest;
+	if (setjmp(ctx.jmp) != 0)
+		return false;
+
+	if (src != NULL)
+		for (i = 0; i < src_capacity; ++i)
+			ll_foreach(src + i, _ht_table_resize_consumer, &ctx);
 
 	return true;
 }
