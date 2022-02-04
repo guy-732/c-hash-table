@@ -11,6 +11,7 @@ SHARED_OBJS = $(ARCHIVES:.a=.so)
 default: all
 
 $(COBJS): %.o: %.c
+$(COBJS): linked-list-submodule
 
 hash-table.o: hash-table.h _ht-node.h
 _ht-node.o: hash-table.h _ht-node.h
@@ -45,7 +46,14 @@ debug: CPPFLAGS += -DDEBUG
 debug: CFLAGS += -g
 debug: all-objs all-archives
 
-$(LL_ARCHIVE):
+$(LL_ARCHIVE): linked-list-submodule
 	$(MAKE) -C linked-list/ CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" $(LL_ARCHIVE_RAW)
 
-.PHONY: all all-objs all-archives all-shared clean-objs clean-archives clean-shared clean default debug
+
+linked-list-submodule: | linked-list/linked-list.h
+
+linked-list/linked-list.h:
+	git submodule init
+	git submodule update
+
+.PHONY: all all-objs all-archives all-shared clean-objs clean-archives clean-shared clean default debug linked-list-submodule
