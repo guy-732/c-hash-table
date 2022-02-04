@@ -1,3 +1,7 @@
+#ifdef DEBUG
+#include <stdio.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -162,6 +166,44 @@ bool ht_search_key(const hash_table_t * ht, ht_key_t key, ht_value_t * value, ht
 		*stored_key = res->key;
 
 	return true;
+}
+
+
+bool ht_remove_value(hash_table_t * ht, ht_key_t key, ht_value_t * value)
+{
+	ht_node_t n, *res;
+	int64_t i;
+	linked_list_t * ll;
+	bool final_ret;
+
+	if (ht == NULL || ht->hash_func == NULL)
+	{
+		errno = EINVAL;
+		return false;
+	}
+
+	if (ht_is_empty(ht))
+		return false;
+
+	n.hash = ht->hash_func(key);
+	ll = ht->table + (n.hash % ht->allocated);
+	if (!ll_search(
+			ll,
+			&n, &i, (ll_value_t *) &res
+	))
+		return false;
+
+	if (value != NULL)
+		*value = res->value;
+
+	final_ret = ll_remove_item(ll, i, NULL);
+	#ifdef DEBUG
+	if (!final_ret)
+		fprintf(stderr, "WARNING: File %s: Line %d: ll_remove_item() returned false (errno: %s)\n",
+		__FILE__, __LINE__, strerror(errno));
+	#endif
+
+	return final_ret;
 }
 
 
