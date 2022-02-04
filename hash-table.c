@@ -72,7 +72,6 @@ void ht_clear(hash_table_t * ht, ht_consume_func_t f, void * ctx)
 	ht->size = 0;
 }
 
-
 void ht_finalize(hash_table_t * ht)
 {
 	if (ht == NULL)
@@ -219,6 +218,65 @@ void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx)
 
 	for (i = 0; i < ht->allocated; ++i)
 		ll_foreach(ht->table + i, ht_func_consumer, &c);
+}
+
+
+bool ht_resize(hash_table_t * ht, uint64_t min_size)
+{
+	uint64_t min_capacity, old_capacity;
+	uint64_t new_capacity, new_threshold;
+	uint64_t i;
+	linked_list_t * table, * tmp;
+
+	if (ht == NULL || min_size > HT_MAX_ALLOCATED)
+	{
+		errno = EINVAL;
+		return false;
+	}
+
+	if (min_size == ht->allocated)
+		return true;
+
+	min_capacity = (ht->allocated / ht->load_factor) + 1;
+	new_capacity = (min_capacity > min_size) ? min_capacity : min_size;
+	if (new_capacity > HT_MAX_ALLOCATED)
+		new_capacity = HT_MAX_ALLOCATED;
+
+	if (new_capacity == ht->allocated)
+		return true;
+
+	old_capacity = ht->allocated;
+	new_threshold = new_capacity * ht->load_factor;
+	table = malloc(sizeof(linked_list_t) * new_capacity);
+	if (table == NULL)
+		return false;
+
+	for (i = 0; i < new_capacity; ++i)
+		ll_init(table + i, _ht_compare_node);
+
+	if (!_ht_transfer(table, new_capacity, ht->table, old_capacity))
+	{
+		for (i = 0; i < new_capacity; ++i)
+			ll_clear(table + i, NULL, NULL);
+
+		free(table);
+		return false;
+	}
+
+	tmp = ht->table;
+	ht->table = table;
+	ht->allocated = new_capacity;
+	ht->threshold = new_threshold;
+
+	if (tmp != NULL)
+	{
+		for (i = 0; i < old_capacity; ++i)
+			ll_clear(tmp + i, NULL, NULL);
+
+		free(tmp);
+	}
+
+	return true;
 }
 
 
