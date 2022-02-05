@@ -6,7 +6,6 @@ COBJS = $(ARCHIVE_COBJS)
 ARCHIVES = libhash-table.a
 LL_ARCHIVE_RAW = liblinked-list.a
 LL_ARCHIVE = linked-list/$(LL_ARCHIVE_RAW)
-SHARED_OBJS = $(ARCHIVES:.a=.so)
 
 default: all
 
@@ -18,17 +17,14 @@ _ht-node.o: hash-table.h _ht-node.h
 _ht-table.o: hash-table.h _ht-node.h _ht-table.h
 
 
-all: all-objs all-archives all-shared
+all: all-objs all-archives
 all-objs: $(COBJS)
 all-archives: $(ARCHIVES)
-all-shared: $(SHARED_OBJS)
 
 libhash-table.a: $(ARCHIVE_COBJS) $(LL_ARCHIVE)
 	cp $(LL_ARCHIVE) $@
 	$(AR) r $@ $(ARCHIVE_COBJS)
 
-$(SHARED_OBJS): %.so: %.a
-	$(CC) -shared $(LDFLAGS) -o $@ -Wl,-whole-archive $^ -Wl,-no-whole-archive
 
 clean-objs:
 	$(RM) $(COBJS)
@@ -36,10 +32,8 @@ clean-objs:
 clean-archives:
 	$(RM) $(ARCHIVES)
 
-clean-shared:
-	$(RM) $(SHARED_OBJS)
 
-clean: clean-objs clean-archives clean-shared
+clean: clean-objs clean-archives
 	$(MAKE) -C linked-list/ RM="$(RM)" clean
 
 debug: CPPFLAGS += -DDEBUG
@@ -56,4 +50,4 @@ linked-list/linked-list.h:
 	git submodule init
 	git submodule update
 
-.PHONY: all all-objs all-archives all-shared clean-objs clean-archives clean-shared clean default debug linked-list-submodule
+.PHONY: all all-objs all-archives clean-objs clean-archives clean default debug linked-list-submodule
