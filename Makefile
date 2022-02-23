@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
 
-ARCHIVE_COBJS = hash-table.o _ht-node.o _ht-table.o
+ARCHIVE_COBJS = hash-table.o _ht-node.o _ht-table.o hash-table-hasher.o
 COBJS = $(ARCHIVE_COBJS)
 ARCHIVES = libhash-table.a
 LL_ARCHIVE_RAW = liblinked-list.a
@@ -12,9 +12,10 @@ default: all
 $(COBJS): %.o: %.c
 $(COBJS): linked-list-submodule
 
-hash-table.o: hash-table.h _ht-node.h
+hash-table.o: hash-table.h _ht-node.h _ht-table.h
 _ht-node.o: hash-table.h _ht-node.h
 _ht-table.o: hash-table.h _ht-node.h _ht-table.h
+hash-table-hasher.o: hash-table.h _ht-node.h
 
 
 all: all-objs all-archives
