@@ -35,6 +35,11 @@ uint64_t ht_hash_uint64(ht_key_t key)
 	return murmur2_64_x64(&v, sizeof(v), seed);
 }
 
+uint64_t ht_murmur_hash2(const void * data, size_t len)
+{
+	return murmur2_64_x64(data, len, murmur_seed);
+}
+
 
 static uint64_t murmur2_64_x64(const void * data, size_t len, uint64_t seed)
 {
