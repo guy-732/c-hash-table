@@ -6,6 +6,11 @@
 
 #include "linked-list/linked-list.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef void * ht_key_t;
 typedef void * ht_value_t;
 
@@ -67,5 +72,9 @@ bool ht_remove_value(hash_table_t * ht, ht_key_t key, ht_value_t * value);
 void ht_foreach(const hash_table_t * ht, ht_consume_func_t f, void * ctx);
 
 bool ht_resize(hash_table_t * ht, uint64_t min_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
