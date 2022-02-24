@@ -1,6 +1,7 @@
 #ifndef __HASH_TABLE_HASHER_H
 #define __HASH_TABLE_HASHER_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include "hash-table.h"
 
